@@ -9,18 +9,18 @@
 
 float next_coordinate_1D(float coord, float vel, float dt){
   /* Calculating new coordinates */
-
-  /* Example: randomize */
-  float ratio = dt*(rand()%10-4.5)/5.0;
+  float ratio = dt*vel;
   return coord += ratio;
 }
 
 float next_velocity_1D(float coord, float vel, float dt){
   /* Calculating new velocities*/
-
-  /* Example:*/
+        /*
   if (coord > 1.5) return vel - 1e-1*dt;
   else             return vel + 1e-1*dt;
+  */
+        auto k = 1;
+        return vel - dt * k * coord;
 }
 
 // --- 2D Structures and Functions ---
