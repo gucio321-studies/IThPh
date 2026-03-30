@@ -44,7 +44,7 @@ fig, ax = plt.subplots()
 # Set up the figure and axes
 points = ax.scatter(*position_velocity,c="b", s=57)
 # Set plot limits and labels
-ax.set(xlim=[0, 3], ylim=[-1, 2], xlabel='position', ylabel='velocity')
+ax.set(xlim=[-2, 2], ylim=[-1, 2], xlabel='position', ylabel='velocity')
 
 # === ANIMATION FUNCTION ===
 def update_frame(frame):
