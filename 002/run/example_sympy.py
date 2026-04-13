@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sympy as sp
 from sympy import symbols, Function, diff, sin, cos, Eq, latex, ccode, simplify
 
