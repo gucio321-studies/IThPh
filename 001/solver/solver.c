@@ -9,17 +9,15 @@
 
 float next_coordinate_1D(float coord, float vel, float dt){
   /* Calculating new coordinates */
-  float ratio = dt*vel;
-  return coord += ratio;
+  return coord += dt*vel;
 }
 
-float next_velocity_1D(float coord, float vel, float dt){
+float next_velocity_1D(float coord, float vel, float dt, float k){
   /* Calculating new velocities*/
         /*
   if (coord > 1.5) return vel - 1e-1*dt;
   else             return vel + 1e-1*dt;
   */
-        auto k = 1;
         return vel - dt * k * coord;
 }
 
@@ -43,15 +41,19 @@ void next_coordinate_2D(Vector2D* coord, Vector2D* vel, Vector2D* new_coord, flo
   if (!coord || !vel || !new_coord) return; // Safety check for null pointers
 
   /* Exemplary use of the helper function */
-  new_coord->x = coord->x + dxdt(coord->x,dt);
-  new_coord->y = coord->y + dxdt(coord->y,dt);
+  //new_coord->x = coord->x + dxdt(coord->x,dt);
+  //new_coord->y = coord->y + dxdt(coord->y,dt);
+  new_coord->x = coord->x + vel->x*dt;
+  new_coord->y = coord->y + vel->y*dt;
 }
 
-void next_velocity_2D(Vector2D* coord, Vector2D* vel, Vector2D* new_vel, float dt) {
+void next_velocity_2D(Vector2D* coord, Vector2D* vel, Vector2D* new_vel, float dt, float k) {
   /* Calculating new velocities in 2D
    * INPUT: `coord`, `vel`, `dt`
    * OUTPUT saved in `new_coord`
    */
   if (!coord || !vel || !new_vel) return; // Safety check for null pointers
+   new_vel->x = vel->x - dt * k * coord->x;
+   new_vel->y = vel->y - dt * k * coord->y;
 }
 

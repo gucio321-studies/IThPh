@@ -27,6 +27,7 @@ else:
     NUMBER_OF_PARTICLES = 1      # Number of particles in the simulation
 RADIUS              = 2.0    # Initial radius for particle placement
 dt                  = 0.01   # Timestep for the simulation
+k = 1
 
 # === CTYPES STRUCTURE DEFINITION ===
 class Vector2D(Structure):
@@ -66,7 +67,7 @@ next_velocity_2D   = _libsolver.next_velocity_2D
 # (IN coord, IN vel, OUT new_(pos|vel), IN dt)
 c_vec_ptr = POINTER(Vector2D)  # Alias for pointer to Vector2D
 next_coordinate_2D.argtypes = [c_vec_ptr, c_vec_ptr, c_vec_ptr, c_float]
-next_velocity_2D.argtypes   = [c_vec_ptr, c_vec_ptr, c_vec_ptr, c_float]
+next_velocity_2D.argtypes   = [c_vec_ptr, c_vec_ptr, c_vec_ptr, c_float, c_float]
 
 # Define the return types (restype) for the C functions
 # 'None' corresponds to a 'void' return type in C.
@@ -133,7 +134,7 @@ def update_frame(frame):
         
         # 2. Calculate the new velocity
         #    C signature: next_velocity_2D(IN _pos, IN old_vel, OUT new_vel, IN dt)
-        next_velocity_2D(byref(relative_position), byref(_velocity), byref(new_velocity), dt)
+        next_velocity_2D(byref(relative_position), byref(_velocity), byref(new_velocity), dt, k)
 
         # 3. Update the master Python lists with the new state
         positions[i]  = new_position

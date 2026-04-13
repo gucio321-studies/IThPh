@@ -13,7 +13,8 @@ import matplotlib.animation as animation
 
 # === CONSTANTS ===
 position_velocity = [1.0,0.1]
-dt    = 0.05
+dt    = 0.01
+k = 1.0
 
 # === C LIBRARY LOADING ===
 # Define the path to the compiled C library (.so file)
@@ -32,7 +33,7 @@ next_velocity_1D   = _libsolver.next_velocity_1D
 # The signature is:
 # (IN coord, IN vel, OUT new_(pos|vel), IN dt)
 next_coordinate_1D.argtypes = [c_float,c_float,c_float]
-next_velocity_1D.argtypes   = [c_float,c_float,c_float]
+next_velocity_1D.argtypes   = [c_float,c_float,c_float, c_float]
 
 # Define the return types (restype) for the C functions
 next_coordinate_1D.restype  = c_float
@@ -53,7 +54,7 @@ def update_frame(frame):
     It calculates the new state of the simulation and updates the plot.
     """
     position_velocity[0] = next_coordinate_1D(*position_velocity,dt)
-    position_velocity[1] = next_velocity_1D(*position_velocity,dt)
+    position_velocity[1] = next_velocity_1D(*position_velocity,dt, k)
 
     # --- Update Matplotlib elements ---
     # Update the positions of the scattered points
