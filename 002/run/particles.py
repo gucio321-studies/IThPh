@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # === IMPORTS ===
 # Standard library imports
 import os
