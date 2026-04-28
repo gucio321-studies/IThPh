@@ -5,20 +5,14 @@
 extern "C" {
 #endif // __cplusplus
 
-struct Vector2D {
+typedef struct {
 	float x;
 	float y;
-
-        Vector2D(float x_, float y_) : x(x_), y(y_) {}
-        Vector2D operator*(const float& scalar);
-        Vector2D operator/(const float& scalar);
-};
+} Vector2D;
 
 void dfdx(Vector2D*, Vector2D*, Vector2D*, Vector2D*, float, size_t);
-Vector2D operator*(float, Vector2D);
+void next_2D(Vector2D* coord, Vector2D* vel, Vector2D* new_coord, Vector2D* new_vel,float t, float dt, size_t N);
 
 #ifdef __cplusplus
 }
 #endif // __cplusplus
-
-Vector2D sin(Vector2D);
