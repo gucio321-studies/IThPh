@@ -50,14 +50,14 @@ void RK4_1D(float* x, float* v, float* dx, float* dv, float t, float dt,
 	// Temporary arrays	
 	const float one_sixth = 0x1.555556p-3f;
 	size_t size = N * sizeof(float);
-	float* tmp_x = malloc(size);
-	float* tmp_v = malloc(size);
+	auto tmp_x = (float*)malloc(size);
+	auto tmp_v = (float*)malloc(size);
 
 	// k1, k2, k3, k4 arrays for position and velocity
-	float* k1_dx = malloc(size); float* k1_dv = malloc(size);
-	float* k2_dx = malloc(size); float* k2_dv = malloc(size);
-	float* k3_dx = malloc(size); float* k3_dv = malloc(size);
-	float* k4_dx = malloc(size); float* k4_dv = malloc(size);
+	auto k1_dx = (float*)malloc(size); auto k1_dv = (float*)malloc(size);
+	auto k2_dx = (float*)malloc(size); auto k2_dv = (float*)malloc(size);
+	auto k3_dx = (float*)malloc(size); auto k3_dv = (float*)malloc(size);
+	auto k4_dx = (float*)malloc(size); auto k4_dv = (float*)malloc(size);
 
 	// Calculate k1, k2, k3, k4
 	dfdx(x,v,k1_dx,k1_dv,t,N);
@@ -135,14 +135,14 @@ void RK4_2D(Vector2D* x, Vector2D* v, Vector2D* dx, Vector2D* dv, float t, float
 	// Temporary arrays
 	const float one_sixth = 0x1.555556p-3f;
 	size_t size = N * sizeof(Vector2D);
-	Vector2D* tmp_x = malloc(size);
-	Vector2D* tmp_v = malloc(size);
+	auto tmp_x = (Vector2D*)malloc(size);
+	auto tmp_v = (Vector2D*)malloc(size);
 
 	// k1, k2, k3, k4 arrays for position and velocity
-	Vector2D* k1_dx = malloc(size); Vector2D* k1_dv = malloc(size);
-	Vector2D* k2_dx = malloc(size); Vector2D* k2_dv = malloc(size);
-	Vector2D* k3_dx = malloc(size); Vector2D* k3_dv = malloc(size);
-	Vector2D* k4_dx = malloc(size); Vector2D* k4_dv = malloc(size);
+	auto k1_dx = (Vector2D*)malloc(size); Vector2D* k1_dv = (Vector2D*)malloc(size);
+	auto k2_dx = (Vector2D*)malloc(size); Vector2D* k2_dv = (Vector2D*)malloc(size);
+	auto k3_dx = (Vector2D*)malloc(size); Vector2D* k3_dv = (Vector2D*)malloc(size);
+	auto k4_dx = (Vector2D*)malloc(size); Vector2D* k4_dv = (Vector2D*)malloc(size);
 
 	// Calculate k1, k2, k3, k4
 	dfdx(x,v,k1_dx,k1_dv,t,N);
@@ -193,8 +193,8 @@ void RK4_2D(Vector2D* x, Vector2D* v, Vector2D* dx, Vector2D* dv, float t, float
 void next_2D(Vector2D* coord, Vector2D* vel, Vector2D* new_coord, Vector2D* new_vel,float t, float dt, size_t N){
 	/* Calculating new coordinates */
 	for(size_t i=0U; i<N; ++i){
-                Vector2D* dx = malloc(sizeof(Vector2D)*N);
-                Vector2D* dv = malloc(sizeof(Vector2D)*N);
+                auto dx = (Vector2D*)malloc(sizeof(Vector2D)*N);
+                auto dv = (Vector2D*)malloc(sizeof(Vector2D)*N);
                 RK4_2D(coord,vel,dx,dv,t,dt,&dfdx,N);
 
 		new_coord[i].x = coord[i].x + dt*dx->x;
@@ -228,6 +228,7 @@ typedef struct {
 } Vector3D;
 
 
+/*
 void RK4_3D(Vector3D* x, Vector3D* v, Vector3D* dx, Vector3D* dv, float t, float dt,
 	    void(*dfdx)(Vector3D*,Vector3D*,Vector3D*,Vector3D*,float,size_t), size_t N){
 	/* RK4 Implementation in 3D
@@ -240,19 +241,18 @@ void RK4_3D(Vector3D* x, Vector3D* v, Vector3D* dx, Vector3D* dv, float t, float
 	 * dfdx = function that computes derivatives
 	 * arguments of dfdx: (x, v, dx, dv, t, N)
 	 * N = number of elements
-	 */
 
 	// Temporary arrays
 	const float one_sixth = 0x1.555556p-3f;
 	size_t size = N * sizeof(Vector3D);
-	Vector3D* tmp_x = malloc(size);
-	Vector3D* tmp_v = malloc(size);
+	auto tmp_x = (Vector3D*)malloc(size);
+	auto tmp_v = (Vector3D*)malloc(size);
 
 	// k1, k2, k3, k4 arrays for position and velocity
-	Vector3D* k1_dx = malloc(size); Vector3D* k1_dv = malloc(size);
-	Vector3D* k2_dx = malloc(size); Vector3D* k2_dv = malloc(size);
-	Vector3D* k3_dx = malloc(size); Vector3D* k3_dv = malloc(size);
-	Vector3D* k4_dx = malloc(size); Vector3D* k4_dv = malloc(size);
+	auto k1_dx = (Vector2D*)malloc(size); auto k1_dv = (Vector3D*)malloc(size);
+	auto k2_dx = (Vector2D*)malloc(size); auto k2_dv = (Vector3D*)malloc(size);
+	auto k3_dx = (Vector2D*)malloc(size); auto k3_dv = (Vector3D*)malloc(size);
+	auto k4_dx = (Vector2D*)malloc(size); auto k4_dv = (Vector3D*)malloc(size);
 
 	// Calculate k1, k2, k3, k4
 	dfdx(x,v,k1_dx,k1_dv,t,N);
@@ -302,6 +302,7 @@ void RK4_3D(Vector3D* x, Vector3D* v, Vector3D* dx, Vector3D* dv, float t, float
 	free(k4_dx); free(k4_dv);
 	return;
 }
+*/
 
 
 /*
