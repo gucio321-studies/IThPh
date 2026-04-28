@@ -33,7 +33,7 @@ gen_lag(autogen_file_path="../solver/l_autogen.c")
 # This assumes 'libsolver.so' is in a 'solve' directory one level *up*
 # from the directory containing this Python script.
 ccompiler = CSharedLibraryCompiler(compiler="g++", source_file=["../solver/solver.c", "../solver/l_autogen_wrapper.c",
-                                                '../solver/helpers.c'])
+                                                '../solver/helpers.c', '../solver/solver.h', '../solver/solver.hpp'])
 __solver_path = ccompiler.compile()
 _libsolver    = cp.EOMSolver(__solver_path, NUMBER_OF_PARTICLES, DIMENSIONS=2)
 
