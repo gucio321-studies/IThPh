@@ -94,7 +94,8 @@ class EOMSolver:
         self.next_step = self.lib.next_2D
         self.c_arr = Vector2D*self.NUMBER_OF_PARTICLES # Alias for pointer to an array of Vector2D
         self.next_step.argtypes = [self.c_vec_ptr, self.c_vec_ptr,
-                                   self.c_vec_ptr, self.c_vec_ptr, c_float, c_int]
+                                   self.c_vec_ptr, self.c_vec_ptr,
+                                   c_float, c_float, c_int]
 
     def _prototype_3D(self):
         """

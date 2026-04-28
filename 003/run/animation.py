@@ -68,6 +68,8 @@ class Animation2D:
         """
         global positions,velocities
 
+        t = frame
+
         # Create empty Vector2D objects to hold the C function results
         new_positions = [self.vector(x=0, y=0) for i in range(self.NUMBER_OF_PARTICLES)]
         new_velocities= [self.vector(x=0, y=0) for i in range(self.NUMBER_OF_PARTICLES)]
@@ -80,7 +82,7 @@ class Animation2D:
         # 1. Calculate the new positions and velocities
         self.next_step(c_positions, c_velocities,
                        c_new_positions, c_new_velocities,
-                       self.dt, self.NUMBER_OF_PARTICLES)
+                       t, self.dt, self.NUMBER_OF_PARTICLES)
         self.positions  = c_positions[:]
         self.velocities = c_velocities[:]
         new_positions   = c_new_positions[:]
