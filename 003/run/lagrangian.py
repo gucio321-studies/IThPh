@@ -5,6 +5,7 @@ import sympy as sp
 from sympy.physics.mechanics import LagrangesMethod, dynamicsymbols
 from sympy.printing.c import ccode
 import os
+import scipy.constants as phys_consts
 
 class LagrangianToC:
     vectorType: str = "Vector2D"
@@ -21,7 +22,8 @@ class LagrangianToC:
         self.q = q
         # We don't need to pass velocities explicitly; LagrangesMethod infers q_dot
 
-    def generate_c_function(self, func_name="equations_of_motion", collapse_constants: bool=True) -> str:
+    def generate_c_function(self, func_name="equations_of_motion", collapse_constants: bool=True, constants_values:
+                            dict[str,float] = []) -> str:
         """
         Generates a C function string that computes accelerations.
         """
@@ -87,7 +89,11 @@ class LagrangianToC:
         if collapse_constants:
             lines.append("    // Constants have been collapsed into their values.")
             for i,c in enumerate(constants):
-                lines.append(f"    float {c.name} = {i}.0{i+1} /* assign proper {c.name} value here */;")
+                if c.name in constants_values:
+                    value = constants_values[c.name]
+                else:
+                    raise ValueError(f"Value for constant '{c.name}' not provided in constants_values dictionary.")
+                lines.append(f"    float {c.name} = {value} /* assign proper {c.name} value here */;")
         for i, expr in enumerate(accel_exprs):
             # Apply the substitution mapping
             mapped_expr = expr.subs(subs_map)
@@ -136,7 +142,10 @@ def gen_lag(autogen_file_path):
     # Note: We only pass L and the coordinate list [theta]
     gen = LagrangianToC(L, [theta])
     with open(autogen_file_path, "w") as f:
-        f.write(gen.generate_c_function("dfdx"))
+        f.write(gen.generate_c_function("dfdx", constants_values={
+            "g": phys_consts.g,
+            "l": 1.0,
+            }))
 
 if __name__ == "__main__":
     # --- Example 1: Simple Pendulum ---
