@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "l_autogen.c"
 #include "solver.h"
 // const float one_sixth  = 0x1.555556p-3f; // float 1/6
 // const double one_sixth = 0x1.5555555555555p-3; // double 1/6
