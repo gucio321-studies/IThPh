@@ -4,6 +4,7 @@ from typing import List
 import sympy as sp
 from sympy.physics.mechanics import LagrangesMethod, dynamicsymbols
 from sympy.printing.c import ccode
+import os
 
 class LagrangianToC:
     vectorType: str = "Vector2D"
@@ -70,10 +71,8 @@ class LagrangianToC:
             subs_map[u_sym] = sp.Symbol(f"dq[{i}]")
 
         # 6. Construct the C Function
-        lines = ["""// This code is Auto-Generated
+        lines = ["""// This code is Auto-Generated. Intended to be used via l_autogen_wrapper.h
 // DO NOT EDIT
-#include "solver.h"
-
         """]
 
         # Function Signature
@@ -117,7 +116,7 @@ class LagrangianToC:
 # run as: python3 -m lagrangian
 # ==========================================
 
-def gen_lag():
+def gen_lag(autogen_file_path):
     # 1. Define Dynamics Symbols (Functions of time)
     theta = dynamicsymbols('theta')
     theta_dot = theta.diff()
@@ -136,7 +135,8 @@ def gen_lag():
     # 4. Generate
     # Note: We only pass L and the coordinate list [theta]
     gen = LagrangianToC(L, [theta])
-    os.WriteFile("../solver/l_autogen.c",gen.generate_c_function("pendulum_step"))
+    with open(autogen_file_path, "w") as f:
+        f.write(gen.generate_c_function("pendulum_step"))
 
 if __name__ == "__main__":
     # --- Example 1: Simple Pendulum ---
