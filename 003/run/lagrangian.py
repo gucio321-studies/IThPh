@@ -136,7 +136,7 @@ def gen_lag(autogen_file_path):
     # Note: We only pass L and the coordinate list [theta]
     gen = LagrangianToC(L, [theta])
     with open(autogen_file_path, "w") as f:
-        f.write(gen.generate_c_function("pendulum_step"))
+        f.write(gen.generate_c_function("dfdx"))
 
 if __name__ == "__main__":
     # --- Example 1: Simple Pendulum ---
