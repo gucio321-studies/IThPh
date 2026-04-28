@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "l_autogen.c"
+#include "solver.h"
 // const float one_sixth  = 0x1.555556p-3f; // float 1/6
 // const double one_sixth = 0x1.5555555555555p-3; // double 1/6
 float RK4(float f, float x, float dt, float(*dfdx)(float,float)){
@@ -116,10 +118,6 @@ void next_1D(float* coord, float* vel, float* new_coord, float* new_vel, float d
                                           ███                                             
                                                                                           
 */
-typedef struct {
-	float x;
-	float y;
-} Vector2D;
 
 void RK4_2D(Vector2D* x, Vector2D* v, Vector2D* dx, Vector2D* dv, float t, float dt,
 	    void(*dfdx)(Vector2D*,Vector2D*,Vector2D*,Vector2D*,float,size_t), size_t N){
@@ -193,14 +191,21 @@ void RK4_2D(Vector2D* x, Vector2D* v, Vector2D* dx, Vector2D* dv, float t, float
  * Calculates the next 2D coordinates and velocities
  */
 
-void next_2D(Vector2D* coord, Vector2D* vel, Vector2D* new_coord, Vector2D* new_vel, float dt, size_t N){
+void next_2D(Vector2D* coord, Vector2D* vel, Vector2D* new_coord, Vector2D* new_vel,float t, float dt, size_t N){
 	/* Calculating new coordinates */
 	for(size_t i=0U; i<N; ++i){
-		new_coord[i].x = coord[i].x + dt*RK4(coord[i].x,vel[i].x,dt,&dxdt);
-		new_coord[i].y = coord[i].y + dt*RK4(coord[i].y,vel[i].y,dt,&dxdt);
+                Vector2D* dx = malloc(sizeof(Vector2D)*N);
+                Vector2D* dv = malloc(sizeof(Vector2D)*N);
+                RK4_2D(coord,vel,dx,dv,t,dt,&dfdx,N);
 
-		new_vel[i].x = vel[i].x + dt*RK4(coord[i].x,vel[i].x,dt,&dvdt);
-		new_vel[i].y = vel[i].y + dt*RK4(coord[i].y,vel[i].y,dt,&dvdt);
+		new_coord[i].x = coord[i].x + dt*dx->x;
+		new_coord[i].y = coord[i].y + dt*dx->y;
+
+		new_vel[i].x = vel[i].x + dt*dv->x;
+		new_vel[i].y = vel[i].y + dt*dv->y;
+
+                free(dx);
+                free(dv);
 	}
 	return;
 }
