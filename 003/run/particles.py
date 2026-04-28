@@ -10,6 +10,7 @@ import numpy as np
 import cprototype as cp
 import animation as anim
 from ccompiler import CSharedLibraryCompiler
+from lagrangian import gen_lag
 
 # === CONSTANTS ===
 if len(argv) > 1:
@@ -24,11 +25,15 @@ else:
 RADIUS              = 2.0    # Initial radius for particle placement
 dt                  = 0.01   # Timestep for the simulation
 
+# === Lagrangian generation ===
+gen_lag(autogen_file_path="../solver/l_autogen.c")
+
 # === C LIBRARY LOADING ===
 # Define the path to the compiled C library (.so file)
 # This assumes 'libsolver.so' is in a 'solve' directory one level *up*
 # from the directory containing this Python script.
-ccompiler = CSharedLibraryCompiler(source_file=["../solver/solver.c", "../solver/l_autogen.c"])
+ccompiler = CSharedLibraryCompiler(compiler="g++", source_file=["../solver/solver.c", "../solver/l_autogen_wrapper.c",
+                                                '../solver/helpers.c'])
 __solver_path = ccompiler.compile()
 _libsolver    = cp.EOMSolver(__solver_path, NUMBER_OF_PARTICLES, DIMENSIONS=2)
 
