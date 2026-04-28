@@ -19,12 +19,12 @@ class CSharedLibraryCompiler:
         """
         Initialize the compiler settings.
         Args:
-            source_file: Path to the .c file (optional, can be passed to compile()).
-            output_dir: Directory to save the library (default: same as source).
+            source_file: List of path to the .c files (optional, can be passed to compile()).
+            output_dir: Directory to save the library (default: same as 1st source file).
             compiler: Command to run compiler (default: 'gcc').
             flags: List of flags. If None, defaults to optimization and strictness.
         """
-        self.source_file = Path(source_file).resolve() if source_file else None
+        self.source_file = [Path(sf).resolve() for sf in source_file] if source_file else None
         self.output_dir = Path(output_dir).resolve() if output_dir else None
         self.compiler = compiler
 
@@ -38,20 +38,22 @@ class CSharedLibraryCompiler:
         """
         Compiles the C file.
         Args:
-            source_override: specific file to compile if not set in __init__.
-            output_name: custom name for the library (without extension).
+            source_override: specific file to compile if not set in __init__ (IMPORTANT: this option does not support
+            list because I was to lazy while modyfing this class).
+            output_name: custom name for the library (without extension) (Default to name of 1st source file).
         Returns:
             str: The absolute path to the compiled library.
         """
         # 1. Resolve Source File
-        target_source = Path(source_override) if source_override else self.source_file
+        target_source = [Path(source_override)] if source_override else self.source_file
 
-        if not target_source or not target_source.exists():
-            raise FileNotFoundError(f"Source file not found: {target_source}")
+        for ts in target_source:
+            if not ts or not ts.exists():
+                raise FileNotFoundError(f"Source file not found: {target_source}")
 
         # 2. Resolve Output Directory
         # If output_dir is not set, use the directory where the source file lives
-        target_dir = self.output_dir if self.output_dir else target_source.parent
+        target_dir = self.output_dir if self.output_dir else target_source[0].parent
 
         # Ensure output dir exists
         if not target_dir.exists():
@@ -71,7 +73,7 @@ class CSharedLibraryCompiler:
                 final_name += lib_ext
         else:
             # Defaults to source filename: 'mylib.c' -> 'libmylib.so'
-            final_name = lib_prefix + target_source.stem + lib_ext
+            final_name = lib_prefix + target_source[0].stem + lib_ext
 
         output_path = target_dir / final_name
 
@@ -95,7 +97,8 @@ class CSharedLibraryCompiler:
         cmd.extend(["-o", str(output_path)])
 
         # Add Source path
-        cmd.append(str(target_source))
+        for ts in target_source:
+            cmd.append(str(ts))
 
         # 5. Execute
         print(f"[Compiler] Executing: {' '.join(cmd)}")

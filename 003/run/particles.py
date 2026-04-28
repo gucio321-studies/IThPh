@@ -28,7 +28,7 @@ dt                  = 0.01   # Timestep for the simulation
 # Define the path to the compiled C library (.so file)
 # This assumes 'libsolver.so' is in a 'solve' directory one level *up*
 # from the directory containing this Python script.
-ccompiler = CSharedLibraryCompiler(source_file="../solver/solver.c")
+ccompiler = CSharedLibraryCompiler(source_file=["../solver/solver.c", "../solver/l_autogen.c"])
 __solver_path = ccompiler.compile()
 _libsolver    = cp.EOMSolver(__solver_path, NUMBER_OF_PARTICLES, DIMENSIONS=2)
 
