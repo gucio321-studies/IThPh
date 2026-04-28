@@ -6,7 +6,7 @@ from sympy.physics.mechanics import LagrangesMethod, dynamicsymbols
 from sympy.printing.c import ccode
 
 class LagrangianToC:
-    vectorType: str = "float"
+    vectorType: str = "Vector2D"
     def __init__(self, L: sp.Expr,
                  q: List[sp.Expr]) -> None:
         """
@@ -70,7 +70,11 @@ class LagrangianToC:
             subs_map[u_sym] = sp.Symbol(f"dq[{i}]")
 
         # 6. Construct the C Function
-        lines = []
+        lines = ["""// This code is Auto-Generated
+// DO NOT EDIT
+#include "solver.h"
+
+        """]
 
         # Function Signature
         if collapse_constants:
@@ -113,8 +117,28 @@ class LagrangianToC:
 # run as: python3 -m lagrangian
 # ==========================================
 
-if __name__ == "__main__":
+def gen_lag():
+    # 1. Define Dynamics Symbols (Functions of time)
+    theta = dynamicsymbols('theta')
+    theta_dot = theta.diff()
 
+    # 2. Define Constants
+    m, g, l = sp.symbols('m g l')
+
+    # 3. Define Energies
+    # Kinetic T = 1/2 m (l * theta_dot)^2
+    T = sp.Rational(1, 2) * m * (l * theta_dot)**2
+    # Potential V = m g l (1 - cos(theta))
+    V = m * g * l * (1 - sp.cos(theta))
+
+    L = T - V
+
+    # 4. Generate
+    # Note: We only pass L and the coordinate list [theta]
+    gen = LagrangianToC(L, [theta])
+    os.WriteFile("../solver/l_autogen.c",gen.generate_c_function("pendulum_step"))
+
+if __name__ == "__main__":
     # --- Example 1: Simple Pendulum ---
     print("--- Generating Code for Simple Pendulum ---")
 
@@ -140,7 +164,7 @@ if __name__ == "__main__":
     print("\n")
 
     # --- Example 2: Double Pendulum (Demonstrating Matrix Solving Capability) ---
-    print("--- Generating Code for Double Pendulum ---")
+    #print("--- Generating Code for Double Pendulum ---")
 
     # Coordinates
     q1, q2 = dynamicsymbols('q1 q2')
@@ -171,4 +195,4 @@ if __name__ == "__main__":
     L_dp = T_dp - V_dp
 
     gen2 = LagrangianToC(L_dp, [q1, q2])
-    print(gen2.generate_c_function("double_pendulum_step",collapse_constants=False))
+    #print(gen2.generate_c_function("dfdx",collapse_constants=False))
