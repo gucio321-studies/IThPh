@@ -93,7 +93,7 @@ class LagrangianToC:
                     value = constants_values[c.name]
                 else:
                     raise ValueError(f"Value for constant '{c.name}' not provided in constants_values dictionary.")
-                lines.append(f"    float {c.name} = {value} /* assign proper {c.name} value here */;")
+                lines.append(f"    auto {c.name} = {value} /* assign proper {c.name} value here */;")
         for i, expr in enumerate(accel_exprs):
             # Apply the substitution mapping
             mapped_expr = expr.subs(subs_map)
@@ -124,26 +124,26 @@ class LagrangianToC:
 
 def gen_lag(autogen_file_path):
     # 1. Define Dynamics Symbols (Functions of time)
-    theta = dynamicsymbols('theta')
-    theta_dot = theta.diff()
+    y = dynamicsymbols('y')
+    y_dot = y.diff()
 
     # 2. Define Constants
     m, g, l = sp.symbols('m g l')
 
     # 3. Define Energies
     # Kinetic T = 1/2 m (l * theta_dot)^2
-    T = sp.Rational(1, 2) * m * (l * theta_dot)**2
+    T = sp.Rational(1, 2) * m * (y_dot)**2
     # Potential V = m g l (1 - cos(theta))
-    V = m * g * l * (1 - sp.cos(theta))
+    V = m * g  * y#* l * (1 - sp.cos(y))
 
     L = T - V
 
     # 4. Generate
     # Note: We only pass L and the coordinate list [theta]
-    gen = LagrangianToC(L, [theta])
+    gen = LagrangianToC(L, [y])
     with open(autogen_file_path, "w") as f:
         f.write(gen.generate_c_function("dfdx", constants_values={
-            "g": phys_consts.g,
+            "g": f"Vector2D{{0., {phys_consts.g}}}",
             "l": 1.0,
             }))
 
