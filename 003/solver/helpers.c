@@ -25,6 +25,10 @@ Vector2D operator-(const Vector2D& src, const float& other) {
         return Vector2D{src.x - other, src.y - other};
 }
 
+Vector2D operator-(const float& src, const Vector2D& other) {
+        return Vector2D{src - other.x, src - other.y};
+}
+
 Vector2D operator+(const Vector2D& src, const float& other) {
         return Vector2D{src.x + other, src.y + other};
 }
