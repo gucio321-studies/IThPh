@@ -40,3 +40,7 @@ Vector2D operator+(const Vector2D& src, const float& other) {
 Vector2D operator+(const float& src, const Vector2D& other) {
         return other + src;
 }
+
+Vector2D operator+(const Vector2D& src, const Vector2D& other) {
+        return Vector2D{src.x + other.x, src.y + other.y};
+}
