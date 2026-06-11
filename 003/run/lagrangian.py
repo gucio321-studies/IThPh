@@ -10,7 +10,7 @@ import json
 from sympy.parsing.sympy_parser import parse_expr
 
 class LagrangianToC:
-    vectorType: str = "Vector2D"
+    vectorType: str = "float"
     def __init__(self, L: sp.Expr,
                  q: List[sp.Expr]) -> None:
         """
@@ -105,7 +105,7 @@ class LagrangianToC:
             # Generate C code
             c_str = ccode(mapped_expr)
             lines.append(f"    _dq[{i}] = dq[{i}];")
-            lines.append(f"    _ddq[{i}] = Vector2D({c_str});")
+            lines.append(f"    _ddq[{i}] = {c_str};")
 
         lines.append("return;")
         lines.append("}")
