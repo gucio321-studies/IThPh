@@ -96,11 +96,15 @@ void RK4_1D(float* x, float* v, float* dx, float* dv, float t, float dt,
 /*
  * Calculates the next 1D coordinates and velocities
  */
-void next_1D(float* coord, float* vel, float* new_coord, float* new_vel, float dt, size_t N){
+void next_1D(float* q, float* dq, float* new_q, float* new_dq, float t, float dt, size_t N){
 	/* Calculating new coordinates */
+    float* k_q = (float*)malloc(sizeof(float)*N);
+    float* k_dq = (float*)malloc(sizeof(float)*N);
+    RK4_1D(q,dq,k_q,k_dq,t,dt,&dfdx,N);
+
 	for(size_t i=0U; i<N; ++i){
-		new_coord[i] = coord[i] + dt*RK4(coord[i],vel[i],dt,&dxdt);
-		new_vel[i] = vel[i] + dt*RK4(coord[i],vel[i],dt,&dvdt);
+		new_q[i] = q[i] + dt*k_q[i];
+		new_dq[i] = dq[i] + dt*k_dq[i];
 	}
 	return;
 }
@@ -197,7 +201,7 @@ void next_2D(Vector2D* coord, Vector2D* vel, Vector2D* new_coord, Vector2D* new_
 	for(size_t i=0U; i<N; ++i){
         auto dx = (Vector2D*)malloc(sizeof(Vector2D)*N);
         auto dv = (Vector2D*)malloc(sizeof(Vector2D)*N);
-        RK4_2D(&(coord[i]),&(vel[i]),dx,dv,t,dt,&dfdx,N);
+        //RK4_2D(&(coord[i]),&(vel[i]),dx,dv,t,dt,&dfdx,N);
         std::cout << "coord: (" << coord[i].y << ")\n";
 
         new_coord[i].x = coord[i].x + dt*dx->x;
