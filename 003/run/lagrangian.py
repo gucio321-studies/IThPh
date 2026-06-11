@@ -6,6 +6,8 @@ from sympy.physics.mechanics import LagrangesMethod, dynamicsymbols
 from sympy.printing.c import ccode
 import os
 import scipy.constants as phys_consts
+import json
+from sympy.parsing.sympy_parser import parse_expr
 
 class LagrangianToC:
     vectorType: str = "Vector2D"
@@ -108,44 +110,31 @@ class LagrangianToC:
 
         return "\n".join(lines)
 
-# ==========================================
-#                                                                        
-#   ▄▄▄▄▄▄▄▄                                          ▄▄▄▄               
-#   ██▀▀▀▀▀▀                                          ▀▀██               
-#   ██        ▀██  ██▀   ▄█████▄  ████▄██▄  ██▄███▄     ██       ▄████▄  
-#   ███████     ████     ▀ ▄▄▄██  ██ ██ ██  ██▀  ▀██    ██      ██▄▄▄▄██ 
-#   ██          ▄██▄    ▄██▀▀▀██  ██ ██ ██  ██    ██    ██      ██▀▀▀▀▀▀ 
-#   ██▄▄▄▄▄▄   ▄█▀▀█▄   ██▄▄▄███  ██ ██ ██  ███▄▄██▀    ██▄▄▄   ▀██▄▄▄▄█ 
-#   ▀▀▀▀▀▀▀▀  ▀▀▀  ▀▀▀   ▀▀▀▀ ▀▀  ▀▀ ▀▀ ▀▀  ██ ▀▀▀       ▀▀▀▀     ▀▀▀▀▀  
-#                                           ██                           
-#                                                                        
-# run as: python3 -m lagrangian
-# ==========================================
+def gen_lag(data_file, autogen_file_path):
+    with open(data_file, "r") as f:
+        data = f.read()
 
-def gen_lag(autogen_file_path):
-    # 1. Define Dynamics Symbols (Functions of time)
-    y = dynamicsymbols('y')
-    y_dot = y.diff()
+    content = json.loads(data)
+    local_dict = {}
 
-    # 2. Define Constants
-    m, g, l = sp.symbols('m g l')
+    q = [ dynamicsymbols(i) for i in content["q"] ]
+    local_dict.update({sym.name: sym for sym in q})
 
-    # 3. Define Energies
-    # Kinetic T = 1/2 m (l * theta_dot)^2
-    T = sp.Rational(1, 2) * m * (y_dot)**2
-    # Potential V = m g l (1 - cos(theta))
-    V = m * g  * y#* l * (1 - sp.cos(y))
+    q_dot = [ i.diff() for i in q ]
+    for i in range(len(q)):
+        local_dict[f'{q[i].name}_dot'] = q_dot[i]
 
-    L = T - V
 
-    # 4. Generate
-    # Note: We only pass L and the coordinate list [theta]
-    gen = LagrangianToC(L, [y])
+    consts = [ sp.symbols(i) for i in content["constants"] ]
+    local_dict.update({sym.name: sym for sym in consts})
+
+    local_dict.update({eq: parse_expr(content["equations"][eq], local_dict=local_dict) for eq in content["equations"]})
+
+    L = parse_expr(content["T"] + "-" + content["V"], local_dict=local_dict)
+    gen = LagrangianToC(L, q)
+
     with open(autogen_file_path, "w") as f:
-        f.write(gen.generate_c_function("dfdx", constants_values={
-            "g": f"Vector2D{{0., {phys_consts.g}}}",
-            "l": 1.0,
-            }))
+        f.write(gen.generate_c_function("dfdx", constants_values=content["constants"]))
 
 if __name__ == "__main__":
     # --- Example 1: Simple Pendulum ---
