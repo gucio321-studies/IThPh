@@ -51,7 +51,7 @@ ani = anim.Animation2D(vector_factory=_libsolver.vector,
                        velocities=velocities,
                        dt=dt,
                        NUMBER_OF_PARTICLES=NUMBER_OF_PARTICLES)
-ani.create_canvas()
+ani.create_canvas(xlim=(-5,5), ylim=(-5,5))
 
 # === RUN ANIMATION ===
 ani.run_animation()

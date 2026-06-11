@@ -41,6 +41,8 @@ class LagrangianToC:
         # The top half is just velocities, the bottom half is accelerations.
         # This step implicitly solves M * q_ddot = F for q_ddot.
         full_rhs = LM.rhs()
+        print(full_rhs)
+        sp.pprint(LM.rhs())
 
         n = len(self.q)
         # Extract only the acceleration expressions (the bottom N rows)
@@ -103,11 +105,12 @@ class LagrangianToC:
             # Generate C code
             c_str = ccode(mapped_expr)
             lines.append(f"    _dq[{i}] = dq[{i}];")
-            lines.append(f"    _ddq[{i}] = {c_str};")
+            lines.append(f"    _ddq[{i}] = Vector2D({c_str});")
 
         lines.append("return;")
         lines.append("}")
 
+        print("\n".join(lines))
         return "\n".join(lines)
 
 def gen_lag(data_file, autogen_file_path):

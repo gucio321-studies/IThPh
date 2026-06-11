@@ -87,6 +87,7 @@ class Animation2D:
         self.velocities = c_velocities[:]
         new_positions   = c_new_positions[:]
         new_velocities  = c_new_velocities[:]
+        print(new_positions, new_velocities)
 
         for i,new_position in enumerate(new_positions):
             # 2. Update the master Python lists with the new state
