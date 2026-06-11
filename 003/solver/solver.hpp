@@ -14,4 +14,5 @@ Vector2D operator+(const float& src, const Vector2D& other);
 Vector2D operator+(const Vector2D& src, const Vector2D& other);
 
 Vector2D sin(Vector2D);
+Vector2D cos(Vector2D);
 Vector2D pow(const Vector2D& v , int p);

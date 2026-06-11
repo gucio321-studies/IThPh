@@ -5,6 +5,10 @@ Vector2D sin(const Vector2D v) {
     return Vector2D{sin(v.x), sin(v.y)};
 }
 
+Vector2D cos(const Vector2D v) {
+    return Vector2D{cos(v.x), cos(v.y)};
+}
+
 Vector2D pow(const Vector2D& v , int p) {
     return Vector2D{pow(v.x, p), pow(v.y, p)};
 }
