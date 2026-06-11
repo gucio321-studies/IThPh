@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "solver.h"
+#include <iostream>
 // const float one_sixth  = 0x1.555556p-3f; // float 1/6
 // const double one_sixth = 0x1.5555555555555p-3; // double 1/6
 float RK4(float f, float x, float dt, float(*dfdx)(float,float)){
@@ -146,6 +147,7 @@ void RK4_2D(Vector2D* x, Vector2D* v, Vector2D* dx, Vector2D* dv, float t, float
 
 	// Calculate k1, k2, k3, k4
 	dfdx(x,v,k1_dx,k1_dv,t,N);
+    std::cout << "rk4  : (" << x->y << ")\n";
 	for(size_t i=0U; i<N; ++i){
 		tmp_x[i].x = x[i].x + 0.5f * dt * k1_dx[i].x;
 		tmp_x[i].y = x[i].y + 0.5f * dt * k1_dx[i].y;
@@ -195,7 +197,8 @@ void next_2D(Vector2D* coord, Vector2D* vel, Vector2D* new_coord, Vector2D* new_
 	for(size_t i=0U; i<N; ++i){
         auto dx = (Vector2D*)malloc(sizeof(Vector2D)*N);
         auto dv = (Vector2D*)malloc(sizeof(Vector2D)*N);
-        RK4_2D(coord,vel,dx,dv,t,dt,&dfdx,N);
+        RK4_2D(&(coord[i]),&(vel[i]),dx,dv,t,dt,&dfdx,N);
+        std::cout << "coord: (" << coord[i].y << ")\n";
 
         new_coord[i].x = coord[i].x + dt*dx->x;
 		new_coord[i].y = coord[i].y + dt*dx->y;
