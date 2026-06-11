@@ -193,11 +193,11 @@ void RK4_2D(Vector2D* x, Vector2D* v, Vector2D* dx, Vector2D* dv, float t, float
 void next_2D(Vector2D* coord, Vector2D* vel, Vector2D* new_coord, Vector2D* new_vel,float t, float dt, size_t N){
 	/* Calculating new coordinates */
 	for(size_t i=0U; i<N; ++i){
-                auto dx = (Vector2D*)malloc(sizeof(Vector2D)*N);
-                auto dv = (Vector2D*)malloc(sizeof(Vector2D)*N);
-                RK4_2D(coord,vel,dx,dv,t,dt,&dfdx,N);
+        auto dx = (Vector2D*)malloc(sizeof(Vector2D)*N);
+        auto dv = (Vector2D*)malloc(sizeof(Vector2D)*N);
+        RK4_2D(coord,vel,dx,dv,t,dt,&dfdx,N);
 
-		new_coord[i].x = coord[i].x + dt*dx->x;
+        new_coord[i].x = coord[i].x + dt*dx->x;
 		new_coord[i].y = coord[i].y + dt*dx->y;
 
 		new_vel[i].x = vel[i].x + dt*dv->x;
