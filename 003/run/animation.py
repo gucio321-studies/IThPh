@@ -83,11 +83,8 @@ class Animation2D:
                        new_qs, new_dqs, # newq and newdq
                        t, self.dt, self.NUMBER_OF_PARTICLES, self.NQ)
 
-        print(self.qs, new_qs, self.dqs, new_dqs)
-
         for i,new_q in enumerate(new_qs):
             # 2. Update the master Python lists with the new state
-            print("Perform pos calculation for particle", i, "qs:", new_q)
             self.qs[i] = new_q
             self.dqs[i] = new_dqs[i]
             result = self.pos_calc.calc(self.qs[i], self.dqs[i])
