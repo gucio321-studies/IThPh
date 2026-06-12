@@ -95,16 +95,23 @@ void RK4_1D(float* x, float* v, float* dx, float* dv, float t, float dt,
 
 /*
  * Calculates the next 1D coordinates and velocities
+ * q is of size q[N][NQ] where N is number of particles and NQ is number of degrees of reedom
  */
-void next_1D(float* q, float* dq, float* new_q, float* new_dq, float t, float dt, size_t N){
+void next_1D(float** q, float** dq, float** new_q, float** new_dq, float t, float dt, size_t N, size_t NQ){
 	/* Calculating new coordinates */
-    float* k_q = (float*)malloc(sizeof(float)*N);
-    float* k_dq = (float*)malloc(sizeof(float)*N);
-    RK4_1D(q,dq,k_q,k_dq,t,dt,&dfdx,N);
 
 	for(size_t i=0U; i<N; ++i){
-		new_q[i] = q[i] + dt*k_q[i];
-		new_dq[i] = dq[i] + dt*k_dq[i];
+        float* k_q = (float*)malloc(sizeof(float)*N);
+        float* k_dq = (float*)malloc(sizeof(float)*N);
+        RK4_1D(q[i],dq[i],k_q,k_dq,t,dt,&dfdx,N);
+
+        for (size_t j=0U; j<NQ; ++j) {
+		    new_q[i][j] = q[i][j] + dt*k_q[i];
+		    new_dq[i][j] = dq[i][j] + dt*k_dq[i];
+        }
+
+        free(k_q);
+        free(k_dq);
 	}
 	return;
 }
