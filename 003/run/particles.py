@@ -44,7 +44,7 @@ positions = [_libsolver.vector(x=RADIUS * np.cos(2 * np.pi * i / NUMBER_OF_PARTI
 velocities = [_libsolver.vector(x=0, y=0) for i in range(NUMBER_OF_PARTICLES)]
 
 # === PLOTTING SETUP ===
-ani = anim.Animation2D(np.array([[1]], dtype=np.float32),vector_factory=_libsolver.vector,
+ani = anim.Animation2D(np.array([[i-NUMBER_OF_PARTICLES/2]*NQ for i in range(NUMBER_OF_PARTICLES)], dtype=np.float32),vector_factory=_libsolver.vector,
                        c_arr=_libsolver.c_arr,
                        next_step=_libsolver.next_step,
                        positions=positions,
