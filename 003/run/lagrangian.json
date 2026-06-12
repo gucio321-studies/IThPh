@@ -3,8 +3,8 @@
         "T": "1/2*m*v2",
         "q": ["theta"],
         "animation": {
-            "x": "l*cos(theta)",
-            "y": "l*sin(theta)"
+            "x": "l*sin(theta)",
+            "y": "-l*cos(theta)"
         },
         "equations": {
             "v2": "(l*theta_dot)**2"
