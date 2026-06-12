@@ -33,7 +33,8 @@ dt                  = 0.01   # Timestep for the simulation
 # This assumes 'libsolver.so' is in a 'solve' directory one level *up*
 # from the directory containing this Python script.
 ccompiler = CSharedLibraryCompiler(compiler="g++", source_file=["../solver/solver.c", "../solver/l_autogen_wrapper.c",
-                                                '../solver/helpers.c', '../solver/solver.h', '../solver/solver.hpp'])
+                                                '../solver/helpers.c', '../solver/solver.h', '../solver/solver.hpp'],
+                                   flags=["-fopenmp", "-O3"])
 __solver_path = ccompiler.compile()
 _libsolver    = cp.EOMSolver(__solver_path, NUMBER_OF_PARTICLES, DIMENSIONS=2, DOF=NQ)
 

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "solver.h"
 #include <iostream>
+#include <omp.h>
 // const float one_sixth  = 0x1.555556p-3f; // float 1/6
 // const double one_sixth = 0x1.5555555555555p-3; // double 1/6
 float RK4(float f, float x, float dt, float(*dfdx)(float,float)){
@@ -62,16 +63,21 @@ void RK4_1D(float* x, float* v, float* dx, float* dv, float t, float dt,
 
 	// Calculate k1, k2, k3, k4
 	dfdx(x,v,k1_dx,k1_dv,t,N);
+    #pragma omp parallel for simd
 	for(size_t i=0U; i<N; ++i){
 		tmp_x[i] = x[i] + 0.5f * dt * k1_dx[i];
 		tmp_v[i] = v[i] + 0.5f * dt * k1_dv[i];
 	}
 	dfdx(tmp_x,tmp_v,k2_dx,k2_dv,t+0.5f*dt,N);
+
+    #pragma omp parallel for simd
 	for(size_t i=0U; i<N; ++i){
 		tmp_x[i] = x[i] + 0.5f * dt * k2_dx[i];
 		tmp_v[i] = v[i] + 0.5f * dt * k2_dv[i];
 	}
+
 	dfdx(tmp_x,tmp_v,k3_dx,k3_dv,t+0.5f*dt,N);
+    #pragma omp parallel for simd
 	for(size_t i=0U; i<N; ++i){
 		tmp_x[i] = x[i] + dt * k3_dx[i];
 		tmp_v[i] = v[i] + dt * k3_dv[i];
@@ -79,6 +85,7 @@ void RK4_1D(float* x, float* v, float* dx, float* dv, float t, float dt,
 	dfdx(tmp_x,tmp_v,k4_dx,k4_dv,t+dt,N);
 
 	// Combine to get final dx and dv
+    #pragma omp parallel for simd
 	for(size_t i=0U; i<N; ++i){
 		dx[i] = one_sixth * (k1_dx[i] + 2.0f * k2_dx[i] + 2.0f * k3_dx[i] + k4_dx[i]);
 		dv[i] = one_sixth * (k1_dv[i] + 2.0f * k2_dv[i] + 2.0f * k3_dv[i] + k4_dv[i]);
@@ -100,9 +107,9 @@ void RK4_1D(float* x, float* v, float* dx, float* dv, float t, float dt,
 void next_1D(float* q, float* dq, float* new_q, float* new_dq, float t, float dt, size_t N, size_t NQ){
 	/* Calculating new coordinates */
 
+    float* k_q = (float*)malloc(sizeof(float)*NQ);
+    float* k_dq = (float*)malloc(sizeof(float)*NQ);
 	for(size_t i=0U; i<N; ++i){
-        float* k_q = (float*)malloc(sizeof(float)*NQ);
-        float* k_dq = (float*)malloc(sizeof(float)*NQ);
         RK4_1D(&q[i*NQ],&dq[i*NQ],k_q,k_dq,t,dt,&dfdx,NQ);
 
         for (size_t j=0U; j<NQ; ++j) {
@@ -110,9 +117,10 @@ void next_1D(float* q, float* dq, float* new_q, float* new_dq, float t, float dt
 		    new_dq[i*NQ+j] = dq[i*NQ+j] + dt*k_dq[j];
         }
 
-        free(k_q);
-        free(k_dq);
 	}
+
+    free(k_q);
+    free(k_dq);
 	return;
 }
 
