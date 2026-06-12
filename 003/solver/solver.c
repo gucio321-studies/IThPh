@@ -48,7 +48,6 @@ void RK4_1D(float* x, float* v, float* dx, float* dv, float t, float dt,
 	 * N = number of elements
 	 */
 
-    std::cout << x[0] << " dupa\n";
 	// Temporary arrays	
 	const float one_sixth = 0x1.555556p-3f;
 	size_t size = N * sizeof(float);
@@ -104,7 +103,6 @@ void next_1D(float* q, float* dq, float* new_q, float* new_dq, float t, float dt
 	for(size_t i=0U; i<N; ++i){
         float* k_q = (float*)malloc(sizeof(float)*N);
         float* k_dq = (float*)malloc(sizeof(float)*N);
-        std::cout << i << std::endl;
         RK4_1D(&q[i*N],&dq[i*N],k_q,k_dq,t,dt,&dfdx,N);
 
         for (size_t j=0U; j<NQ; ++j) {
