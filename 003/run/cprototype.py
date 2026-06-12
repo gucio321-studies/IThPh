@@ -7,6 +7,7 @@ A prototype Python script that demonstrates how to interface with a C library
 # and ctypes (https://docs.python.org/3/library/ctypes.html)
 import numpy as np
 from ctypes import c_float, c_int, Structure, POINTER, byref, cdll
+import numpy.ctypeslib as npct
 
 
 # === CTYPES STRUCTURE DEFINITION ===
@@ -50,19 +51,21 @@ class Vector3D(Structure):
         data[i, :] = np.array((self.x, self.y, self.z))
 
 class EOMSolver:
-    def __init__(self, path, NUMBER_OF_PARTICLES=1, DIMENSIONS=1):
+    def __init__(self, path, NUMBER_OF_PARTICLES=1, DIMENSIONS=1, DOF=1):
         """
         Load a C shared library from the specified path.
         """
         self.lib = cdll.LoadLibrary(path)
         self.NUMBER_OF_PARTICLES = NUMBER_OF_PARTICLES
+        self.DOF = DOF
         self.DIMENSIONS = DIMENSIONS
         if DIMENSIONS == 1:
             self.c_vec_ptr = POINTER(c_float)  # Alias for pointer to Vector1D
             self._prototype_1D()
         elif DIMENSIONS == 2:
             self.c_vec_ptr = POINTER(Vector2D) # Alias for pointer to Vector2D
-            self._prototype_2D()
+            #self._prototype_2D()
+            self._prototype_1D() # lagrangian will be 1d anyway
         elif DIMENSIONS == 3:
             self.c_vec_ptr = POINTER(Vector3D) # Alias for pointer to Vector3D
             self._prototype_3D()
@@ -80,9 +83,20 @@ class EOMSolver:
         (IN coord, IN vel, OUT new_(pos|vel), IN dt, IN N)
         """
         self.next_step = self.lib.next_1D
-        self.c_arr = c_float *self.NUMBER_OF_PARTICLES # Alias for pointer to an array of Vector1D
-        self.next_step.argtypes = [self.c_vec_ptr, self.c_vec_ptr,
-                                   self.c_vec_ptr, self.c_vec_ptr, c_float, c_int]
+#        self.c_arr = c_float *self.NUMBER_OF_PARTICLES # Alias for pointer to an array of Vector1D
+#        self.c_arr = self.c_arr * self.DOF
+        self.c_arr = npct.ndpointer(dtype=np.float32, ndim=2, flags="C_CONTIGUOUS")
+#        self.next_step.argtypes = [self.c_vec_ptr, self.c_vec_ptr,
+#                                   self.c_vec_ptr, self.c_vec_ptr, c_float, c_int]
+        self.next_step.argtypes = [self.c_arr, # q
+                                   self.c_arr, # dq
+                                   self.c_arr, # new_q
+                                   self.c_arr, # new_dq
+                                   c_float, # t
+                                   c_float, # dt
+                                   c_int, # N
+                                   c_int # DOF
+                                   ]
 
     def _prototype_2D(self):
         """
@@ -91,7 +105,7 @@ class EOMSolver:
         `void next_2D(Vector2D* coord, Vector2D* vel, Vector2D* new_coord, Vector2D* new_vel, float dt, size_t N);`
         exists in the C library.
         """
-        self.next_step = self.lib.next_2D
+        self.next_step = self.lib.next_1D
         self.c_arr = Vector2D*self.NUMBER_OF_PARTICLES # Alias for pointer to an array of Vector2D
         self.next_step.argtypes = [self.c_vec_ptr, self.c_vec_ptr,
                                    self.c_vec_ptr, self.c_vec_ptr,

@@ -14,11 +14,14 @@ import matplotlib.animation as animation
 
 
 class Animation2D:
-    def __init__(self,vector_factory=None, c_arr=None,
+    def __init__(self,qs,vector_factory=None, c_arr=None,
                  next_step=None,positions=None, velocities=None,
-                 dt=0.01,NUMBER_OF_PARTICLES=1):
+                 dt=0.01,NUMBER_OF_PARTICLES=1, NQ=0):
         self.data = np.zeros((NUMBER_OF_PARTICLES, 2))
 
+        self.qs = qs
+        self.dqs = np.zeros((NUMBER_OF_PARTICLES, NQ), dtype=np.float32)
+        self.NQ = NQ
         self.vector = vector_factory
         self.c_arr = c_arr
         self.next_step = next_step
@@ -71,31 +74,26 @@ class Animation2D:
         t = frame
 
         # Create empty Vector2D objects to hold the C function results
-        new_positions = [self.vector(x=0, y=0) for i in range(self.NUMBER_OF_PARTICLES)]
-        new_velocities= [self.vector(x=0, y=0) for i in range(self.NUMBER_OF_PARTICLES)]
-
-        c_positions       = self.c_arr(*self.positions)
-        c_velocities      = self.c_arr(*self.velocities)
-        c_new_positions   = self.c_arr(*new_positions)
-        c_new_velocities  = self.c_arr(*new_velocities)
+        new_qs = np.zeros((self.NUMBER_OF_PARTICLES, self.NQ), dtype=np.float32)
+        new_dqs = np.zeros((self.NUMBER_OF_PARTICLES, self.NQ), dtype=np.float32)
 
         # 1. Calculate the new positions and velocities
-        self.next_step(c_positions, c_velocities,
-                       c_new_positions, c_new_velocities,
-                       t, self.dt, self.NUMBER_OF_PARTICLES)
-        self.positions  = c_positions[:]
-        self.velocities = c_velocities[:]
-        new_positions   = c_new_positions[:]
-        new_velocities  = c_new_velocities[:]
-        print(new_positions, new_velocities)
+        self.next_step(self.qs, self.dqs, # q and dq
+                       new_qs, new_dqs, # newq and newdq
+                       t, self.dt, self.NUMBER_OF_PARTICLES, self.NQ)
 
-        for i,new_position in enumerate(new_positions):
+        print(self.qs, new_qs, self.dqs, new_dqs)
+
+        for i,new_q in enumerate(new_qs):
             # 2. Update the master Python lists with the new state
-            self.positions[i]  = new_position
-            self.velocities[i] = new_velocities[i]
+            print("Perform pos calculation for particle", i, "qs:", new_q)
+            self.qs[i] = new_q
+            self.dqs[i] = new_dqs[i]
+            #self.positions[i]  = new_position
+            #self.velocities[i] = new_velocities[i]
 
             # 3. Update the NumPy plotting array
-            new_position(self.data, i)
+            #new_position(self.data, i)
 
         # --- Update Matplotlib elements ---
         # Update the positions of the scattered points

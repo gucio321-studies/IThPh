@@ -26,7 +26,7 @@ RADIUS              = 2.0    # Initial radius for particle placement
 dt                  = 0.01   # Timestep for the simulation
 
 # === Lagrangian generation ===
-gen_lag(data_file="lagrangian.json", autogen_file_path="../solver/l_autogen.c")
+NQ = gen_lag(data_file="lagrangian.json", autogen_file_path="../solver/l_autogen.c")
 
 # === C LIBRARY LOADING ===
 # Define the path to the compiled C library (.so file)
@@ -35,7 +35,7 @@ gen_lag(data_file="lagrangian.json", autogen_file_path="../solver/l_autogen.c")
 ccompiler = CSharedLibraryCompiler(compiler="g++", source_file=["../solver/solver.c", "../solver/l_autogen_wrapper.c",
                                                 '../solver/helpers.c', '../solver/solver.h', '../solver/solver.hpp'])
 __solver_path = ccompiler.compile()
-_libsolver    = cp.EOMSolver(__solver_path, NUMBER_OF_PARTICLES, DIMENSIONS=2)
+_libsolver    = cp.EOMSolver(__solver_path, NUMBER_OF_PARTICLES, DIMENSIONS=2, DOF=NQ)
 
 # +== INITIAL CONDITIONS ===
 positions = [_libsolver.vector(x=RADIUS * np.cos(2 * np.pi * i / NUMBER_OF_PARTICLES),
@@ -44,13 +44,13 @@ positions = [_libsolver.vector(x=RADIUS * np.cos(2 * np.pi * i / NUMBER_OF_PARTI
 velocities = [_libsolver.vector(x=0, y=0) for i in range(NUMBER_OF_PARTICLES)]
 
 # === PLOTTING SETUP ===
-ani = anim.Animation2D(vector_factory=_libsolver.vector,
+ani = anim.Animation2D(np.array([[.2]], dtype=np.float32),vector_factory=_libsolver.vector,
                        c_arr=_libsolver.c_arr,
                        next_step=_libsolver.next_step,
                        positions=positions,
                        velocities=velocities,
                        dt=dt,
-                       NUMBER_OF_PARTICLES=NUMBER_OF_PARTICLES)
+                       NUMBER_OF_PARTICLES=NUMBER_OF_PARTICLES, NQ=NQ)
 ani.create_canvas(xlim=(-5,5), ylim=(-5,5))
 
 # === RUN ANIMATION ===

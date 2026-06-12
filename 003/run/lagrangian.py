@@ -139,6 +139,8 @@ def gen_lag(data_file, autogen_file_path):
     with open(autogen_file_path, "w") as f:
         f.write(gen.generate_c_function("dfdx", constants_values=content["constants"]))
 
+    return len(q)
+
 if __name__ == "__main__":
     # --- Example 1: Simple Pendulum ---
     print("--- Generating Code for Simple Pendulum ---")
