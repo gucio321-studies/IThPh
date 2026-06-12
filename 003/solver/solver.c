@@ -101,14 +101,13 @@ void next_1D(float* q, float* dq, float* new_q, float* new_dq, float t, float dt
 	/* Calculating new coordinates */
 
 	for(size_t i=0U; i<N; ++i){
-        std::cout << "---" << q[i*NQ] << std::endl;
-        float* k_q = (float*)malloc(sizeof(float)*N);
-        float* k_dq = (float*)malloc(sizeof(float)*N);
+        float* k_q = (float*)malloc(sizeof(float)*NQ);
+        float* k_dq = (float*)malloc(sizeof(float)*NQ);
         RK4_1D(&q[i*NQ],&dq[i*NQ],k_q,k_dq,t,dt,&dfdx,NQ);
 
         for (size_t j=0U; j<NQ; ++j) {
-		    new_q[i*NQ+j] = q[i*NQ+j] + dt*k_q[i];
-		    new_dq[i*NQ+j] = dq[i*NQ+j] + dt*k_dq[i];
+		    new_q[i*NQ+j] = q[i*NQ+j] + dt*k_q[j];
+		    new_dq[i*NQ+j] = dq[i*NQ+j] + dt*k_dq[j];
         }
 
         free(k_q);
