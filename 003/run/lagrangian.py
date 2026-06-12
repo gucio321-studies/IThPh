@@ -9,6 +9,19 @@ import scipy.constants as phys_consts
 import json
 from sympy.parsing.sympy_parser import parse_expr
 
+class PosCalculator:
+    def __init__(self, x_expr: sp.Expr, y_expr: sp.Expr, q_mapper, dq_mapper, constants):
+        self.x_expr = x_expr
+        self.y_expr = y_expr
+        self.q_mapper = q_mapper
+        self.dq_mapper = dq_mapper
+        self.constants = constants
+    def calc(self, q, dq):
+        d = {self.q_mapper[i]: q[i] for i in range(len(q))}
+        d.update({self.dq_mapper[i]: dq[i] for i in range(len(dq))})
+        d.update({c: self.constants[c] for c in self.constants})
+        return (self.x_expr.subs(d), self.y_expr.subs(d))
+
 class LagrangianToC:
     vectorType: str = "float"
     def __init__(self, L: sp.Expr,
@@ -139,7 +152,10 @@ def gen_lag(data_file, autogen_file_path):
     with open(autogen_file_path, "w") as f:
         f.write(gen.generate_c_function("dfdx", constants_values=content["constants"]))
 
-    return len(q)
+    x_expr = parse_expr(content["animation"]["x"], local_dict=local_dict)
+    y_expr = parse_expr(content["animation"]["y"], local_dict=local_dict)
+    pc = PosCalculator(x_expr, y_expr, [sym.name for sym in q], [f'{sym.name}_dot' for sym in q], consts)
+    return (len(q), pc)
 
 if __name__ == "__main__":
     # --- Example 1: Simple Pendulum ---

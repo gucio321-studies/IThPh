@@ -1,0 +1,17 @@
+{
+        "V": "-m*g*l*cos(theta)",
+        "T": "1/2*m*v2",
+        "q": ["theta"],
+        "animation": {
+            "x": "l*cos(theta)",
+            "y": "l*sin(theta)"
+        },
+        "equations": {
+            "v2": "(l*theta_dot)**2"
+        },
+        "constants": {
+                "m": 1,
+                "g": 10,
+                "l": 1
+        }
+}

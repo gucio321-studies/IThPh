@@ -26,7 +26,7 @@ RADIUS              = 2.0    # Initial radius for particle placement
 dt                  = 0.01   # Timestep for the simulation
 
 # === Lagrangian generation ===
-NQ = gen_lag(data_file="lagrangian.json", autogen_file_path="../solver/l_autogen.c")
+(NQ, posCalculator) = gen_lag(data_file="lagrangian.json", autogen_file_path="../solver/l_autogen.c")
 
 # === C LIBRARY LOADING ===
 # Define the path to the compiled C library (.so file)
