@@ -12,7 +12,7 @@ typedef struct {
 
 void dfdx(float*, float*, float*, float*, float, size_t);
 void next_2D(Vector2D* coord, Vector2D* vel, Vector2D* new_coord, Vector2D* new_vel,float t, float dt, size_t N);
-void next_1D(float* q, float* dq, float* new_q, float* new_dq,float t, float dt, size_t N);
+void next_1D(float* q, float* dq, float* new_q, float* new_dq,float t, float dt, size_t N, size_t DOF);
 
 #ifdef __cplusplus
 }
