@@ -16,8 +16,9 @@ import matplotlib.animation as animation
 class Animation2D:
     def __init__(self,qs,vector_factory=None, c_arr=None,
                  next_step=None,positions=None, velocities=None,
-                 dt=0.01,NUMBER_OF_PARTICLES=1, NQ=0):
+                 dt=0.01,NUMBER_OF_PARTICLES=1, NQ=0, pos_calc=None):
         self.data = np.zeros((NUMBER_OF_PARTICLES, 2))
+        self.pos_calc = pos_calc
 
         self.qs = qs
         self.dqs = np.zeros((NUMBER_OF_PARTICLES, NQ), dtype=np.float32)
@@ -89,11 +90,11 @@ class Animation2D:
             print("Perform pos calculation for particle", i, "qs:", new_q)
             self.qs[i] = new_q
             self.dqs[i] = new_dqs[i]
-            #self.positions[i]  = new_position
-            #self.velocities[i] = new_velocities[i]
+            result = self.pos_calc.calc(self.qs[i], self.dqs[i])
+            self.positions[i] = self.vector(x=result[0], y=result[1])
 
             # 3. Update the NumPy plotting array
-            #new_position(self.data, i)
+            self.positions[i](self.data, i)
 
         # --- Update Matplotlib elements ---
         # Update the positions of the scattered points

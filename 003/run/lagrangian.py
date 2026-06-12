@@ -154,7 +154,7 @@ def gen_lag(data_file, autogen_file_path):
 
     x_expr = parse_expr(content["animation"]["x"], local_dict=local_dict)
     y_expr = parse_expr(content["animation"]["y"], local_dict=local_dict)
-    pc = PosCalculator(x_expr, y_expr, [sym.name for sym in q], [f'{sym.name}_dot' for sym in q], consts)
+    pc = PosCalculator(x_expr, y_expr, q, q_dot, content["constants"])
     return (len(q), pc)
 
 if __name__ == "__main__":
